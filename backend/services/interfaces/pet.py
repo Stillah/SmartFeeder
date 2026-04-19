@@ -8,17 +8,17 @@ class PetsInterface(Protocol):
     """Interface for working with pets."""
 
     @abstractmethod
-    def add(self, name: str, weight: float | None, age: int | None, breed: str | None) -> UUID:
+    async def add(self, owner_id: UUID, name: str, weight: float | None, age: int | None, breed: str | None, target_portion: float | None) -> UUID:
         """Add a pet to the database."""
 
     @abstractmethod
-    def load(self, id: UUID) -> PetModel:
+    async def load(self, id: UUID) -> PetModel:
         """Load a pet from the database by id."""
 
     @abstractmethod
-    def update(self, **kwargs) -> None:
+    async def update(self, id: UUID, **kwargs) -> None:
         """Edit pet parameters in the database."""
 
     @abstractmethod
-    def delete(self, id: int) -> None:
+    async def delete(self, id: UUID) -> None:
         """Delete a pet from the database."""
