@@ -6,6 +6,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from backend.services.interfaces.image import ImageInterface
 from backend.infrastructure.db.image import ImageModel
 
+# For classification
+# SPECIFY !!!
+THRESHOLD = 1.0
+
 @dataclass
 class ImageAdapter(ImageInterface):
     session: AsyncSession
@@ -29,9 +33,6 @@ class ImageAdapter(ImageInterface):
             
         closest_dist = rows[0].distance
 
-        # SPECIFY !!!
-        THRESHOLD = 1.0
-        
         if closest_dist > THRESHOLD:
             return None
             
@@ -52,5 +53,10 @@ class ImageAdapter(ImageInterface):
 
     async def delete(self, id: UUID) -> None:
         stmt = delete(ImageModel).where(ImageModel.id == id)
+        await self.session.execute(stmt)
+        await self.session.commit()
+
+    async def delete_all(self) -> None:
+        stmt = delete(ImageModel)
         await self.session.execute(stmt)
         await self.session.commit()
