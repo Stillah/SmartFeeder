@@ -11,6 +11,8 @@ async def create_pet(pet: PetCreate, adapter: PetsAdapter = Depends(get_pets_ada
     try:
         pet_id = await adapter.add(**pet.model_dump())
         return {"id": pet_id}
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to create pet: {str(e)}")
 
@@ -21,5 +23,7 @@ async def get_pet(pet_id: UUID, adapter: PetsAdapter = Depends(get_pets_adapter)
         if not pet:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Pet not found")
         return pet
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to load pet: {str(e)}")
