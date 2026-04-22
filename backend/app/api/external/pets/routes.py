@@ -1,18 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from uuid import UUID
-from pydantic import BaseModel
 from backend.app.dependencies.adapters import get_pets_adapter
 from backend.infrastructure.adapters.pet import PetsAdapter
+from backend.schemas.pets import PetCreate
 
-router = APIRouter()
-
-class PetCreate(BaseModel):
-    owner_id: UUID
-    name: str
-    weight: float | None = None
-    age: int | None = None
-    breed: str | None = None
-    target_portion: float | None = None
+router = APIRouter(prefix="/pets", tags=["External Pets"])
 
 @router.post("/")
 async def create_pet(pet: PetCreate, adapter: PetsAdapter = Depends(get_pets_adapter)):

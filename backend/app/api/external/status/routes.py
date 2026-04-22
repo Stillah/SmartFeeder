@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from backend.app.dependencies.adapters import get_feeder_status_adapter
 from backend.infrastructure.adapters.feeder_status import FeederStatusAdapter
 
-router = APIRouter()
+router = APIRouter(prefix="/status", tags=["External Status"])
 
 @router.get("/")
 async def get_feeder_status(adapter: FeederStatusAdapter = Depends(get_feeder_status_adapter)):

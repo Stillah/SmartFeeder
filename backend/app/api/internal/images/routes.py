@@ -5,7 +5,7 @@ from backend.app.dependencies.adapters import get_image_adapter
 from backend.infrastructure.adapters.images import ImageAdapter
 from backend.infrastructure.exceptions.image import ClassificationError
 
-router = APIRouter()
+router = APIRouter(prefix="/image", tags=["Internal Images"])
 
 @router.post("/")
 async def send_image(user_id: UUID, file: UploadFile, adapter: ImageAdapter = Depends(get_image_adapter)) -> UUID:
