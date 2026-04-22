@@ -4,6 +4,7 @@ sqlalchemy
 asyncpg
 pgvector
 pydantic
+python-dotenv
 
 pytest
 pytest-asyncio

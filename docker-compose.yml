@@ -1,20 +1,21 @@
-version: '3.8'
+x-postgres-env: &postgres-env
+  POSTGRES_DB: ${POSTGRES_DB}
+  POSTGRES_USER: ${POSTGRES_USER}
+  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
 services:
   db:
     image: ankane/pgvector:latest
     container_name: smartfeeder_db
     environment:
-      POSTGRES_DB: smartfeeder
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgrespassword
+      <<: *postgres-env
     ports:
-      - "5433:5433"
+      - "${POSTGRES_PORT}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d smartfeeder"]
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -25,7 +26,10 @@ services:
     ports:
       - "8000:8000"
     environment:
-      DATABASE_URL: postgresql+asyncpg://postgres:postgrespassword@db:5432/smartfeeder
+      <<: *postgres-env
+      POSTGRES_HOST: db
+      # внутри сети compose слушает Postgres на 5432 (не порт публикации на хосте)
+      POSTGRES_PORT: "5432"
     depends_on:
       db:
         condition: service_healthy
