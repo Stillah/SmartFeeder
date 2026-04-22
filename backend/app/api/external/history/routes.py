@@ -3,7 +3,7 @@ from uuid import UUID
 from backend.app.dependencies.adapters import get_history_adapter
 from backend.infrastructure.adapters.history import HistoryAdapter
 
-router = APIRouter()
+router = APIRouter(prefix="/history", tags=["External History"])
 
 @router.get("/{pet_id}")
 async def get_pet_history(pet_id: UUID, adapter: HistoryAdapter = Depends(get_history_adapter)):

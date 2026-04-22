@@ -57,13 +57,9 @@ docs/_build/
 
 # PyBuilder
 target/
-<<<<<<< Updated upstream
-maildir
-=======
 maildir
 
 venv
 .venv
 
 .env
->>>>>>> Stashed changes

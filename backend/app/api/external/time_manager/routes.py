@@ -1,15 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from uuid import UUID
-from pydantic import BaseModel
 from backend.app.dependencies.adapters import get_time_manager_adapter
 from backend.infrastructure.adapters.time_manager import TimeManagerAdapter
+from backend.schemas.schedules import ScheduleCreate
 
-router = APIRouter()
-
-class ScheduleCreate(BaseModel):
-    user_id: UUID
-    start_time: int
-    end_time: int
+router = APIRouter(prefix="/schedules", tags=["External Schedules"])
 
 @router.post("/")
 async def add_schedule(schedule: ScheduleCreate, adapter: TimeManagerAdapter = Depends(get_time_manager_adapter)):
