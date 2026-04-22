@@ -18,7 +18,7 @@ async def send_image(user_id: UUID, file: UploadFile, adapter: ImageAdapter = De
         if not label:
             raise ClassificationError()
         
-        image_id = await adapter.insert(embedding=embedding, pet_id=label, user_id=user_id)
+        image_id = await adapter.insert(embedding=embedding, pet_id=label, user_id=user_id, image_bytes=img)
         # TODO: log that the cat came at this time
         
         return image_id
