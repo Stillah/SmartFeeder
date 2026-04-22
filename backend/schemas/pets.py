@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from uuid import UUID
 
+
 class PetCreate(BaseModel):
     owner_id: UUID
     name: str

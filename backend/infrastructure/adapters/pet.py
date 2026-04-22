@@ -5,18 +5,27 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from backend.services.interfaces.pet import PetsInterface
 from backend.infrastructure.db.pet import PetModel
 
+
 @dataclass
 class PetsAdapter(PetsInterface):
     session: AsyncSession
 
-    async def add(self, owner_id: UUID, name: str, weight: float | None, age: int | None, breed: str | None, target_portion: float | None) -> UUID:
+    async def add(
+        self,
+        owner_id: UUID,
+        name: str,
+        weight: float | None,
+        age: int | None,
+        breed: str | None,
+        target_portion: float | None,
+    ) -> UUID:
         pet = PetModel(
             owner_id=owner_id,
             name=name,
             weight=weight,
             age=age,
             breed=breed,
-            target_portion=target_portion
+            target_portion=target_portion,
         )
         self.session.add(pet)
         await self.session.commit()

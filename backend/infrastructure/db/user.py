@@ -3,6 +3,7 @@ from sqlalchemy import String, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .base import Base
 
+
 class UserModel(Base):
     __tablename__ = "users"
 
@@ -11,5 +12,9 @@ class UserModel(Base):
     hashed_password: Mapped[str] = mapped_column(String(255))
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
-    pets: Mapped[list["PetModel"]] = relationship("PetModel", back_populates="owner", cascade="all, delete-orphan")
-    schedules: Mapped[list["ScheduleModel"]] = relationship("ScheduleModel", back_populates="user", cascade="all, delete-orphan")
+    pets: Mapped[list["PetModel"]] = relationship(
+        "PetModel", back_populates="owner", cascade="all, delete-orphan"
+    )
+    schedules: Mapped[list["ScheduleModel"]] = relationship(
+        "ScheduleModel", back_populates="user", cascade="all, delete-orphan"
+    )

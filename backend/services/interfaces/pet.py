@@ -4,11 +4,20 @@ from uuid import UUID
 
 from backend.infrastructure.db.pet import PetModel
 
+
 class PetsInterface(Protocol):
     """Interface for working with pets."""
 
     @abstractmethod
-    async def add(self, owner_id: UUID, name: str, weight: float | None, age: int | None, breed: str | None, target_portion: float | None) -> UUID:
+    async def add(
+        self,
+        owner_id: UUID,
+        name: str,
+        weight: float | None,
+        age: int | None,
+        breed: str | None,
+        target_portion: float | None,
+    ) -> UUID:
         """Add a pet to the database."""
 
     @abstractmethod

@@ -46,7 +46,9 @@ def start_camera(user_id: str, display: bool = False) -> None:
 
         # Detect cat faces in the image
         cat_faces = cat_face_cascade.detectMultiScale(gray, 1.3, 5)
-        if len(cat_faces) > 0:
+
+        # Exactly one cat
+        if len(cat_faces) == 1:
             cnt_cats += 1
 
         if cycle == FRAMES_IN_CYCLE:

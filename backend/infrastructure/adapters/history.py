@@ -5,18 +5,23 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from backend.services.interfaces.history import HistoryInterface
 from backend.infrastructure.db.log import LogsModel
 
+
 @dataclass
 class HistoryAdapter(HistoryInterface):
     session: AsyncSession
 
     async def get_food_consumption_mean(self, pet_id: UUID) -> float:
-        stmt = select(func.avg(LogsModel.amount_eaten)).where(LogsModel.pet_id == pet_id)
+        stmt = select(func.avg(LogsModel.amount_eaten)).where(
+            LogsModel.pet_id == pet_id
+        )
         result = await self.session.execute(stmt)
         mean = result.scalar()
         return float(mean) if mean is not None else 0.0
 
     async def get_food_consumption_std(self, pet_id: UUID) -> float:
-        stmt = select(func.stddev(LogsModel.amount_eaten)).where(LogsModel.pet_id == pet_id)
+        stmt = select(func.stddev(LogsModel.amount_eaten)).where(
+            LogsModel.pet_id == pet_id
+        )
         result = await self.session.execute(stmt)
         std = result.scalar()
         return float(std) if std is not None else 0.0

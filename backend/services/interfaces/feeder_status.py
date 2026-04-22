@@ -2,6 +2,7 @@ from typing import Protocol
 from abc import abstractmethod
 from datetime import datetime
 
+
 class FeederStatusInterface(Protocol):
     """Interface for getting info about the misc."""
 

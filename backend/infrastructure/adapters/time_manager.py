@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from backend.services.interfaces.timer_manager import TimeManagmentInterface
 from backend.infrastructure.db.schedule import ScheduleModel
 
+
 @dataclass
 class TimeManagerAdapter(TimeManagmentInterface):
     session: AsyncSession
@@ -20,15 +21,22 @@ class TimeManagerAdapter(TimeManagmentInterface):
         schedules = result.scalars().all()
         return [(s.start_time, s.end_time) for s in schedules]
 
-    async def update(self, user_id: UUID, old_start: int, old_end: int, new_start: int | None, new_end: int | None) -> None:
+    async def update(
+        self,
+        user_id: UUID,
+        old_start: int,
+        old_end: int,
+        new_start: int | None,
+        new_end: int | None,
+    ) -> None:
         stmt = select(ScheduleModel).where(
             ScheduleModel.user_id == user_id,
             ScheduleModel.start_time == old_start,
-            ScheduleModel.end_time == old_end
+            ScheduleModel.end_time == old_end,
         )
         result = await self.session.execute(stmt)
         schedule = result.scalar_one_or_none()
-        
+
         if schedule:
             if new_start is not None:
                 schedule.start_time = new_start
@@ -40,7 +48,7 @@ class TimeManagerAdapter(TimeManagmentInterface):
         stmt = delete(ScheduleModel).where(
             ScheduleModel.user_id == user_id,
             ScheduleModel.start_time == start,
-            ScheduleModel.end_time == end
+            ScheduleModel.end_time == end,
         )
         await self.session.execute(stmt)
         await self.session.commit()

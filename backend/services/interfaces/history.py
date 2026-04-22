@@ -2,6 +2,7 @@ from typing import Protocol
 from abc import abstractmethod
 from uuid import UUID
 
+
 class HistoryInterface(Protocol):
     """Interface for getting info about pets."""
 

@@ -11,29 +11,30 @@ from backend.infrastructure.db.log import LogsModel
 
 logger = logging.getLogger(__name__)
 
+
 async def seed_db():
     logger.info("Checking if database needs seeding...")
     async with async_session_maker() as session:
         # Проверяем, есть ли уже пользователи в базе
         result = await session.execute(select(UserModel).limit(1))
         existing_user = result.scalars().first()
-        
+
         if existing_user:
             logger.info("Database is already seeded. Skipping.")
             return
 
         logger.info("Seeding database with test data...")
-        
+
         # Создаем тестового пользователя
         test_user_id = uuid.uuid4()
         test_user = UserModel(
             id=test_user_id,
             email="test@example.com",
             hashed_password="fake_hashed_password",
-            is_active=True
+            is_active=True,
         )
         session.add(test_user)
-        
+
         # Создаем тестового питомца
         test_pet_id = uuid.uuid4()
         test_pet = PetModel(
@@ -43,45 +44,45 @@ async def seed_db():
             weight=4.5,
             age=3,
             breed="British Shorthair",
-            target_portion=150.0
+            target_portion=150.0,
         )
         session.add(test_pet)
-        
+
         # Создаем тестовое расписание (например, с 08:00 до 09:00)
         # Время хранится в секундах от начала дня
         test_schedule = ScheduleModel(
             user_id=test_user_id,
-            start_time=28800, # 08:00 AM
-            end_time=32400    # 09:00 AM
+            start_time=28800,  # 08:00 AM
+            end_time=32400,  # 09:00 AM
         )
         session.add(test_schedule)
-        
+
         # Создаем статус кормушки
         feeder_status = FeederStatusModel(
             id=1,
             last_connection=datetime.datetime.now(datetime.UTC),
-            current_food_weight=500.0
+            current_food_weight=500.0,
         )
         # Проверяем, есть ли уже статус кормушки
         status_result = await session.execute(select(FeederStatusModel).limit(1))
         if not status_result.scalars().first():
             session.add(feeder_status)
-        
+
         # Создаем логи кормления для статистики (истории)
         log1 = LogsModel(
             pet_id=test_pet_id,
             amount_eaten=50.0,
-            timestamp=datetime.datetime.now(datetime.UTC) - datetime.timedelta(days=1)
+            timestamp=datetime.datetime.now(datetime.UTC) - datetime.timedelta(days=1),
         )
         log2 = LogsModel(
             pet_id=test_pet_id,
             amount_eaten=45.0,
-            timestamp=datetime.datetime.now(datetime.UTC) - datetime.timedelta(days=2)
+            timestamp=datetime.datetime.now(datetime.UTC) - datetime.timedelta(days=2),
         )
         session.add_all([log1, log2])
-        
+
         await session.commit()
-        
+
         logger.info("Database seeded successfully!")
         logger.info(f"--- TEST DATA ---")
         logger.info(f"Test User ID: {test_user_id}")

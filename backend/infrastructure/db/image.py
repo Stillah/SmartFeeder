@@ -4,6 +4,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from pgvector.sqlalchemy import Vector
 from .base import Base
 
+
 class ImageModel(Base):
     __tablename__ = "images"
 

@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from backend.services.interfaces.feeder_status import FeederStatusInterface
 from backend.infrastructure.db.feeder_status import FeederStatusModel
 
+
 @dataclass
 class FeederStatusAdapter(FeederStatusInterface):
     session: AsyncSession

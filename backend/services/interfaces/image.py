@@ -3,6 +3,7 @@ from abc import abstractmethod
 from typing import Protocol
 from uuid import UUID
 
+
 class ImageInterface(Protocol):
     """Interface for working with camera images."""
 
@@ -11,7 +12,9 @@ class ImageInterface(Protocol):
         """Make an embedding from an image."""
 
     @abstractmethod
-    async def classify(self, embedding: list[float], user_id: UUID, k: int = 7) -> UUID | None:
+    async def classify(
+        self, embedding: list[float], user_id: UUID, k: int = 7
+    ) -> UUID | None:
         """
         Classify an image embedding as a majority class in k nearest embeddings.
         Filtered by user_id.

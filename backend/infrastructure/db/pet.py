@@ -3,6 +3,7 @@ from sqlalchemy import String, Float, Integer, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .base import Base
 
+
 class PetModel(Base):
     __tablename__ = "pets"
 
@@ -15,5 +16,9 @@ class PetModel(Base):
     target_portion: Mapped[float | None] = mapped_column(Float, nullable=True)
 
     owner: Mapped["UserModel"] = relationship("UserModel", back_populates="pets")
-    images: Mapped[list["ImageModel"]] = relationship("ImageModel", back_populates="pet", cascade="all, delete-orphan")
-    feeding_logs: Mapped[list["LogsModel"]] = relationship("LogsModel", back_populates="pet", cascade="all, delete-orphan")
+    images: Mapped[list["ImageModel"]] = relationship(
+        "ImageModel", back_populates="pet", cascade="all, delete-orphan"
+    )
+    feeding_logs: Mapped[list["LogsModel"]] = relationship(
+        "LogsModel", back_populates="pet", cascade="all, delete-orphan"
+    )
