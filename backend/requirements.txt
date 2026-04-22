@@ -10,3 +10,7 @@ pytest-asyncio
 httpx
 
 python-multipart
+
+requests
+opencv-python
+
