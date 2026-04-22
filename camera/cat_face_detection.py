@@ -42,7 +42,7 @@ def start_camera(user_id: str, display: bool = False) -> None:
 
     cnt_cats = 0
     frame_number = 1
-    
+
     images = []
 
     while True:

@@ -1,6 +1,7 @@
 import struct
 from serial import Serial
 
+
 class Weights:
 
     def __init__(
