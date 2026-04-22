@@ -34,13 +34,8 @@ async def test_send_image(async_client, mock_image_adapter):
     assert result[1][0] == str(image_id)
 
     mock_image_adapter.make_embedding.assert_called_once_with(b"fake_image_data")
-    mock_image_adapter.classify.assert_called_once_with(
-        embedding=[0.1, 0.2, 0.3], user_id=user_id
-    )
-    mock_image_adapter.insert.assert_called_once_with(
-        embedding=[0.1, 0.2, 0.3], pet_id=pet_id, user_id=user_id
-    )
-
+    mock_image_adapter.classify.assert_called_once_with(embedding=[0.1, 0.2, 0.3], user_id=user_id)
+    mock_image_adapter.insert.assert_called_once_with(embedding=[0.1, 0.2, 0.3], pet_id=pet_id, user_id=user_id, image_bytes=b"fake_image_data")
 
 @pytest.mark.asyncio
 async def test_send_image_classification_error(async_client, mock_image_adapter):

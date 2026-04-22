@@ -1,9 +1,11 @@
 from dataclasses import dataclass
 from uuid import UUID
+from typing import List
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from backend.services.interfaces.history import HistoryInterface
 from backend.infrastructure.db.log import LogsModel
+from backend.schemas.history import FeedingLogResponse, AnalysisResponse
 
 
 @dataclass
@@ -39,3 +41,15 @@ class HistoryAdapter(HistoryInterface):
         log = LogsModel(pet_id=pet_id, amount_eaten=amount_eaten)
         self.session.add(log)
         await self.session.commit()
+
+    async def get_recent_feedings(self, pet_id: UUID, limit: int = 10) -> List[FeedingLogResponse]:
+        stmt = select(LogsModel).where(LogsModel.pet_id == pet_id).order_by(LogsModel.timestamp.desc()).limit(limit)
+        result = await self.session.execute(stmt)
+        logs = result.scalars().all()
+        return [FeedingLogResponse.model_validate(log) for log in logs]
+
+    async def get_analysis(self, pet_id: UUID) -> AnalysisResponse:
+        mean = await self.get_food_consumption_mean(pet_id)
+        std = await self.get_food_consumption_std(pet_id)
+        times = await self.get_average_eating_times(pet_id)
+        return AnalysisResponse(mean=mean, std=std, average_eating_times=times)

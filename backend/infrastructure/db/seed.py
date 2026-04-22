@@ -1,4 +1,6 @@
+import os
 import uuid
+import random
 import datetime
 import logging
 from sqlalchemy import select
@@ -8,6 +10,7 @@ from backend.infrastructure.db.pet import PetModel
 from backend.infrastructure.db.schedule import ScheduleModel
 from backend.infrastructure.db.feeder_status import FeederStatusModel
 from backend.infrastructure.db.log import LogsModel
+from backend.infrastructure.db.image import ImageModel
 
 logger = logging.getLogger(__name__)
 
@@ -18,10 +21,10 @@ async def seed_db():
         # Проверяем, есть ли уже пользователи в базе
         result = await session.execute(select(UserModel).limit(1))
         existing_user = result.scalars().first()
-
-        if existing_user:
-            logger.info("Database is already seeded. Skipping.")
-            return
+        
+        # if existing_user:
+        #     logger.info("Database is already seeded. Skipping.")
+        #     return
 
         logger.info("Seeding database with test data...")
 
@@ -29,9 +32,7 @@ async def seed_db():
         test_user_id = uuid.uuid4()
         test_user = UserModel(
             id=test_user_id,
-            email="test@example.com",
-            hashed_password="fake_hashed_password",
-            is_active=True,
+            is_active=True
         )
         session.add(test_user)
 
@@ -80,11 +81,43 @@ async def seed_db():
             timestamp=datetime.datetime.now(datetime.UTC) - datetime.timedelta(days=2),
         )
         session.add_all([log1, log2])
-
+        
+        # Создаем тестовые изображения и эмбеддинги
+        storage_dir = "storage/images"
+        os.makedirs(storage_dir, exist_ok=True)
+        
+        # Минимальный валидный GIF 1x1 пиксель (прозрачный) для тестов
+        tiny_gif = b'GIF89a\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\xff\xff\xff!\xf9\x04\x01\x00\x00\x00\x00,\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02D\x01\x00;'
+        
+        images = []
+        for i in range(3):
+            img_id = uuid.uuid4()
+            filename = f"{img_id}.gif"
+            filepath = os.path.join(storage_dir, filename)
+            
+            with open(filepath, "wb") as f:
+                f.write(tiny_gif)
+                
+            # Генерируем случайный эмбеддинг (512 размерность)
+            embedding = [random.uniform(-1.0, 1.0) for _ in range(512)]
+            
+            img_model = ImageModel(
+                id=img_id,
+                pet_id=test_pet_id,
+                user_id=test_user_id,
+                embedding=embedding,
+                image_path=filepath,
+                timestamp=datetime.datetime.now(datetime.UTC) - datetime.timedelta(hours=i)
+            )
+            images.append(img_model)
+            
+        session.add_all(images)
+        
         await session.commit()
 
         logger.info("Database seeded successfully!")
         logger.info(f"--- TEST DATA ---")
         logger.info(f"Test User ID: {test_user_id}")
         logger.info(f"Test Pet ID: {test_pet_id}")
+        logger.info(f"Generated 3 test images in {storage_dir}")
         logger.info(f"-----------------")

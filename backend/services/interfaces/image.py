@@ -22,10 +22,16 @@ class ImageInterface(Protocol):
         """
 
     @abstractmethod
-    async def insert(self, embedding: list[float], pet_id: UUID, user_id: UUID) -> UUID:
+    async def insert(self, embedding: list[float], pet_id: UUID, user_id: UUID, image_bytes: bytes | None = None) -> UUID:
         """
-        Insert an image into the database.
+        Insert an image into the database and optionally save it locally.
         Returns image_id.
+        """
+
+    @abstractmethod
+    async def get_latest_images(self, pet_id: UUID, limit: int = 5) -> list[str]:
+        """
+        Get the latest image paths for a specific pet.
         """
 
     @abstractmethod
