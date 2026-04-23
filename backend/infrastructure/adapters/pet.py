@@ -38,6 +38,12 @@ class PetsAdapter(PetsInterface):
             raise ValueError(f"Pet with id {id} not found")
         return pet
 
+    async def get_by_owner_id(self, owner_id: UUID) -> list[PetModel]:
+        stmt = select(PetModel).where(PetModel.owner_id == owner_id)
+        result = await self.session.execute(stmt)
+        pets = result.scalars().all()
+        return pets
+
     async def update(self, id: UUID, **kwargs) -> None:
         if not kwargs:
             return
