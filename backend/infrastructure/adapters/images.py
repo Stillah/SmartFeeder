@@ -9,11 +9,10 @@ from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from backend.services.interfaces.image import ImageInterface
 from backend.infrastructure.db.image import ImageModel
+from backend.infrastructure.adapters.pet import PetsAdapter
 
-# For classification
-# SPECIFY !!!
-THRESHOLD = 1.0
-STORAGE_DIR = "storage/images"
+THRESHOLD = float(os.getenv("THRESHOLD"))
+STORAGE_DIR = os.getenv("STORAGE_DIR", "storage/images")
 EMBEDDINGS_URL = os.getenv("EMBEDDINGS_URL")
 
 logger = logging.getLogger(__name__)
@@ -69,13 +68,17 @@ class ImageAdapter(ImageInterface):
 
         raise Exception("Please specify EMBEDDINGS_URL in .env!")
 
-    async def classify(
-        self, embedding: list[float], user_id: UUID, k: int = 7
-    ) -> UUID | None:
+    async def _create_new_pet(self, user_id: UUID) -> UUID:
+        pets = PetsAdapter(self.session)
+        pet_id = await pets.add(owner_id=user_id)
+        logger.info("Created new pet id=%s for user_id=%s", pet_id, user_id)
+        return pet_id
+
+    async def classify(self, embedding: list[float], user_id: UUID, k: int = 7) -> UUID:
         stmt_with_dist = (
             select(
                 ImageModel.pet_id,
-                ImageModel.embedding.l2_distance(embedding).label("distance"),
+                ImageModel.embedding.cosine_distance(embedding).label("distance"),
             )
             .where(ImageModel.user_id == user_id)
             .order_by("distance")
@@ -86,20 +89,18 @@ class ImageAdapter(ImageInterface):
         rows = result_dist.all()
 
         if not rows:
-            return None
+            return await self._create_new_pet(user_id)
 
         closest_dist = rows[0].distance
 
         if closest_dist > THRESHOLD:
-            return None
+            return await self._create_new_pet(user_id)
 
-        # Majority voting
-        counts = {}
+        counts: dict[UUID, int] = {}
         for row in rows:
             counts[row.pet_id] = counts.get(row.pet_id, 0) + 1
 
-        best_pet_id = max(counts, key=counts.get)
-        return best_pet_id
+        return max(counts, key=counts.get)
 
     async def insert(
         self,

@@ -13,11 +13,11 @@ class PetsAdapter(PetsInterface):
     async def add(
         self,
         owner_id: UUID,
-        name: str,
-        weight: float | None,
-        age: int | None,
-        breed: str | None,
-        target_portion: float | None,
+        name: str = "Unnamed cat",
+        weight: float | None = None,
+        age: int | None = None,
+        breed: str | None = None,
+        target_portion: float | None = None,
     ) -> UUID:
         pet = PetModel(
             owner_id=owner_id,

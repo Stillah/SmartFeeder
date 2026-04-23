@@ -1,4 +1,3 @@
-import numpy as np
 import datetime
 from abc import abstractmethod
 from typing import Protocol
@@ -15,11 +14,11 @@ class ImageInterface(Protocol):
     @abstractmethod
     async def classify(
         self, embedding: list[float], user_id: UUID, k: int = 7
-    ) -> UUID | None:
+    ) -> UUID:
         """
-        Classify an image embedding as a majority class in k nearest embeddings.
-        Filtered by user_id.
-        Returns pet_id or None if distance > threshold.
+        Classify an image embedding as a majority class among k nearest embeddings
+        (cosine distance), filtered by user_id. If there is no reference data or
+        the nearest neighbor is too far, creates a new pet and returns its id.
         """
 
     @abstractmethod

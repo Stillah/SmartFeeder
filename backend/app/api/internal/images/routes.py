@@ -3,8 +3,6 @@ from fastapi import APIRouter, Depends, HTTPException, status, UploadFile
 from uuid import UUID
 from backend.app.dependencies.adapters import get_image_adapter
 from backend.infrastructure.adapters.images import ImageAdapter
-from backend.infrastructure.exceptions.image import ClassificationError
-from collections import Counter
 from backend.services.image import ImageService
 
 router = APIRouter(prefix="/image", tags=["Internal Images"])

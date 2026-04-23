@@ -3,9 +3,6 @@ import uuid
 from unittest.mock import AsyncMock
 from backend.main import app
 from backend.app.dependencies.adapters import get_image_adapter
-from backend.infrastructure.exceptions.image import ClassificationError
-
-
 @pytest.fixture
 def mock_image_adapter():
     mock = AsyncMock()
@@ -50,11 +47,13 @@ async def test_send_image(async_client, mock_image_adapter):
 
 
 @pytest.mark.asyncio
-async def test_send_image_classification_error(async_client, mock_image_adapter):
+async def test_send_image_insert_error(async_client, mock_image_adapter):
     user_id = uuid.uuid4()
+    pet_id = uuid.uuid4()
 
     mock_image_adapter.make_embedding.return_value = [0.1, 0.2, 0.3]
-    mock_image_adapter.classify.return_value = None
+    mock_image_adapter.classify.return_value = pet_id
+    mock_image_adapter.insert.side_effect = RuntimeError("db write failed")
 
     files = [("files", ("test.jpg", b"fake_image_data", "image/jpeg"))]
 

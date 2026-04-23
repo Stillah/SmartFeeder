@@ -6,7 +6,6 @@ from uuid import UUID
 from fastapi import HTTPException, status
 
 from backend.infrastructure.adapters.images import ImageAdapter
-from backend.infrastructure.exceptions.image import ClassificationError
 
 logger = logging.getLogger(__name__)
 
@@ -53,15 +52,6 @@ class ImageService:
                     embedding=embedding, user_id=user_id
                 )
                 embeddings.append(embedding)
-
-                if not label:
-                    logger.warning(
-                        "process_images: image %d/%d — classify returned no label",
-                        i + 1,
-                        len(image_batch),
-                    )
-                    raise ClassificationError("Could not classify image")
-
                 labels[label] += 1
 
             most_common_label = labels.most_common(1)[0][0]

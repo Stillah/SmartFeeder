@@ -23,14 +23,16 @@ services:
   backend:
     build: ./backend
     container_name: smartfeeder_backend
+    # Переменные из корня репозитория (EMBEDDINGS_URL, THRESHOLD, STORAGE_DIR, …)
+    env_file:
+      - .env
     ports:
       - "8000:8000"
     environment:
       <<: *postgres-env
+      # Перекрывают значения из .env для хоста: внутри compose БД — сервис db
       POSTGRES_HOST: db
-      # внутри сети compose слушает Postgres на 5432 (не порт публикации на хосте)
       POSTGRES_PORT: "5432"
-      EMBEDDINGS_URL: ${EMBEDDINGS_URL}
     depends_on:
       db:
         condition: service_healthy

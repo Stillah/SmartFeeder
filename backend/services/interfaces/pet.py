@@ -12,11 +12,11 @@ class PetsInterface(Protocol):
     async def add(
         self,
         owner_id: UUID,
-        name: str,
-        weight: float | None,
-        age: int | None,
-        breed: str | None,
-        target_portion: float | None,
+        name: str = "Unnamed cat",
+        weight: float | None = None,
+        age: int | None = None,
+        breed: str | None = None,
+        target_portion: float | None = None,
     ) -> UUID:
         """Add a pet to the database."""
 
