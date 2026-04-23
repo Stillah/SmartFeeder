@@ -22,7 +22,6 @@ async def seed_db():
         result = await session.execute(select(UserModel).limit(1))
         existing_user = result.scalars().first()
 
-
         # if existing_user:
         #     logger.info("Database is already seeded. Skipping.")
         #     return
@@ -81,11 +80,9 @@ async def seed_db():
         )
         session.add_all([log1, log2])
 
-
         # Создаем тестовые изображения и эмбеддинги
         storage_dir = "storage/images"
         os.makedirs(storage_dir, exist_ok=True)
-
 
         # Минимальный валидный GIF 1x1 пиксель (прозрачный) для тестов
         tiny_gif = b"GIF89a\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\xff\xff\xff!\xf9\x04\x01\x00\x00\x00\x00,\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02D\x01\x00;"
@@ -98,14 +95,11 @@ async def seed_db():
             filename = f"{img_id}.gif"
             filepath = os.path.join(storage_dir, filename)
 
-
             with open(filepath, "wb") as f:
                 f.write(tiny_gif)
 
-
             # Генерируем случайный эмбеддинг (512 размерность)
             embedding = [random.uniform(-1.0, 1.0) for _ in range(512)]
-
 
             img_model = ImageModel(
                 id=img_id,
@@ -115,14 +109,10 @@ async def seed_db():
                 image_path=filepath,
                 timestamp=datetime.datetime.now(datetime.UTC)
                 - datetime.timedelta(hours=i),
-                timestamp=datetime.datetime.now(datetime.UTC)
-                - datetime.timedelta(hours=i),
             )
             images.append(img_model)
 
-
         session.add_all(images)
-
 
         await session.commit()
 

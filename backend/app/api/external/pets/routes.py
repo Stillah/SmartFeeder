@@ -62,12 +62,21 @@ async def delete_pet(pet_id: UUID, adapter: PetsAdapter = Depends(get_pets_adapt
         await adapter.delete(pet_id)
         return {"status": "success"}
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to delete pet: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to delete pet: {str(e)}",
+        )
+
 
 @router.get("/user/{user_id}", response_model=List[PetResponse])
-async def get_user_pets(user_id: UUID, adapter: PetsAdapter = Depends(get_pets_adapter)):
+async def get_user_pets(
+    user_id: UUID, adapter: PetsAdapter = Depends(get_pets_adapter)
+):
     try:
         pets = await adapter.get_by_owner_id(user_id)
         return [PetResponse.model_validate(pet) for pet in pets]
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to fetch pets: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to fetch pets: {str(e)}",
+        )

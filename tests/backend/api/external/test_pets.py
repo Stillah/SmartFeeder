@@ -59,7 +59,6 @@ async def test_get_pet_not_found(async_client, mock_pets_adapter):
     assert response.json() == {"detail": "Pet not found"}
 
 
-
 @pytest.mark.asyncio
 async def test_update_pet(async_client, mock_pets_adapter):
     pet_id = uuid.uuid4()
@@ -68,7 +67,6 @@ async def test_update_pet(async_client, mock_pets_adapter):
     payload = {"name": "Barsik Updated", "weight": 5.0}
 
     response = await async_client.put(f"/pets/{pet_id}", json=payload)
-
 
     assert response.status_code == 200
     assert response.json() == {"status": "success"}
@@ -86,27 +84,21 @@ async def test_update_pet_error(async_client, mock_pets_adapter):
     pet_id = uuid.uuid4()
     mock_pets_adapter.update.side_effect = Exception("DB Error")
 
-
     response = await async_client.put(f"/pets/{pet_id}", json={"name": "Barsik"})
-
 
     assert response.status_code == 500
     assert "Failed to update pet" in response.json()["detail"]
-
 
 
 @pytest.mark.asyncio
 async def test_delete_pet(async_client, mock_pets_adapter):
     pet_id = uuid.uuid4()
 
-
     response = await async_client.delete(f"/pets/{pet_id}")
-
 
     assert response.status_code == 200
     assert response.json() == {"status": "success"}
     mock_pets_adapter.delete.assert_called_once_with(pet_id)
-
 
 
 @pytest.mark.asyncio
@@ -114,9 +106,7 @@ async def test_delete_pet_error(async_client, mock_pets_adapter):
     pet_id = uuid.uuid4()
     mock_pets_adapter.delete.side_effect = Exception("DB Error")
 
-
     response = await async_client.delete(f"/pets/{pet_id}")
-
 
     assert response.status_code == 500
     assert "Failed to delete pet" in response.json()["detail"]

@@ -71,7 +71,6 @@ class ImageAdapter(ImageInterface):
             os.makedirs(STORAGE_DIR, exist_ok=True)
             import uuid
 
-
             filename = f"{uuid.uuid4()}.jpg"
             image_path = os.path.join(STORAGE_DIR, filename)
             with open(image_path, "wb") as f:

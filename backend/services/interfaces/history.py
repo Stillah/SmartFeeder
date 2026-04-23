@@ -27,9 +27,6 @@ class HistoryInterface(Protocol):
     async def get_recent_feedings(
         self, pet_id: UUID, limit: int = 10
     ) -> List[FeedingLogResponse]:
-    async def get_recent_feedings(
-        self, pet_id: UUID, limit: int = 10
-    ) -> List[FeedingLogResponse]:
         """Get recent feeding logs for a specific pet."""
 
     @abstractmethod

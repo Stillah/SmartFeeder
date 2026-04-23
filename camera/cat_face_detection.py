@@ -94,7 +94,6 @@ def start_camera(user_id: str, display: bool = False) -> None:
             images.append(img)
 
         last = datetime.now()
-        # time.sleep(1)
 
         if camera.check_close_display():
             break

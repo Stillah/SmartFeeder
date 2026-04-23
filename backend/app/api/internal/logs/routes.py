@@ -14,7 +14,6 @@ async def create_log(
     user_id: UUID,
     food_weight: float,
     files_batch: list[UploadFile],
-    food_weight: float,
     timestamp: datetime.datetime | None = None,
     image_adapter: ImageAdapter = Depends(get_image_adapter),
     history_adapter: HistoryAdapter = Depends(get_history_adapter),

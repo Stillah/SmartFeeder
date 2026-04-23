@@ -18,6 +18,7 @@ class PetUpdate(BaseModel):
     breed: str | None = None
     target_portion: float | None = None
 
+
 class PetResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

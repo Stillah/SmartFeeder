@@ -51,6 +51,7 @@ class HistoryAdapter(HistoryInterface):
             .order_by(LogsModel.timestamp.desc())
             .limit(limit)
         )
+
     async def get_recent_feedings(
         self, pet_id: UUID, limit: int = 10
     ) -> List[FeedingLogResponse]:
