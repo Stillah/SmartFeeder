@@ -1,4 +1,5 @@
 import numpy as np
+import datetime
 from abc import abstractmethod
 from typing import Protocol
 from uuid import UUID
@@ -22,7 +23,14 @@ class ImageInterface(Protocol):
         """
 
     @abstractmethod
-    async def insert(self, embedding: list[float], pet_id: UUID, user_id: UUID, image_bytes: bytes | None = None) -> UUID:
+    async def insert(
+        self,
+        embedding: list[float],
+        pet_id: UUID,
+        user_id: UUID,
+        image_bytes: bytes | None = None,
+        timestamp: "datetime.datetime | None" = None,
+    ) -> UUID:
         """
         Insert an image into the database and optionally save it locally.
         Returns image_id.

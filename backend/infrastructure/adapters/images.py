@@ -1,5 +1,6 @@
 import numpy as np
 import os
+import datetime
 from dataclasses import dataclass
 from uuid import UUID
 from sqlalchemy import select, delete
@@ -52,30 +53,65 @@ class ImageAdapter(ImageInterface):
         best_pet_id = max(counts, key=counts.get)
         return best_pet_id
 
-    async def insert(self, embedding: list[float], pet_id: UUID, user_id: UUID, image_bytes: bytes | None = None) -> UUID:
+    async def insert(
+        self,
+        embedding: list[float],
+        pet_id: UUID,
+        user_id: UUID,
+        image_bytes: bytes | None = None,
+        timestamp: datetime.datetime | None = None,
+    ) -> UUID:
         image_path = None
         if image_bytes:
             os.makedirs(STORAGE_DIR, exist_ok=True)
             import uuid
+
             filename = f"{uuid.uuid4()}.jpg"
             image_path = os.path.join(STORAGE_DIR, filename)
             with open(image_path, "wb") as f:
                 f.write(image_bytes)
 
-        image = ImageModel(pet_id=pet_id, user_id=user_id, embedding=embedding, image_path=image_path)
+        image = ImageModel(
+            pet_id=pet_id, user_id=user_id, embedding=embedding, image_path=image_path
+        )
+        if timestamp is not None:
+            image.timestamp = timestamp
         self.session.add(image)
         await self.session.commit()
         await self.session.refresh(image)
         return image.id
 
     async def get_latest_images(self, pet_id: UUID, limit: int = 5) -> list[str]:
+        from sqlalchemy import func
+        import base64
+
+        stmt_max_ts = select(func.max(ImageModel.timestamp)).where(
+            ImageModel.pet_id == pet_id, ImageModel.image_path.isnot(None)
+        )
+        result_max = await self.session.execute(stmt_max_ts)
+        max_ts = result_max.scalar()
+
+        if not max_ts:
+            return []
+
         stmt = select(ImageModel.image_path).where(
             ImageModel.pet_id == pet_id,
-            ImageModel.image_path.isnot(None)
-        ).order_by(ImageModel.timestamp.desc()).limit(limit)
-        
+            ImageModel.image_path.isnot(None),
+            ImageModel.timestamp == max_ts,
+        )
+
         result = await self.session.execute(stmt)
-        return [row[0] for row in result.all()]
+        paths = [row[0] for row in result.all()]
+
+        images_base64 = []
+        for path in paths:
+            try:
+                with open(path, "rb") as f:
+                    encoded = base64.b64encode(f.read()).decode("utf-8")
+                    images_base64.append(encoded)
+            except Exception:
+                pass
+        return images_base64
 
     async def delete(self, id: UUID) -> None:
         stmt = delete(ImageModel).where(ImageModel.id == id)
