@@ -14,13 +14,14 @@ router = APIRouter(prefix="/image", tags=["Internal Images"])
 async def send_image(
     user_id: UUID,
     files: list[UploadFile],
+    timestamp: datetime.datetime | None = None,
     adapter: ImageAdapter = Depends(get_image_adapter),
 ) -> tuple[UUID, list[UUID]]:
     """Get pet_id of the pet in the images and the list of image_id's"""
     try:
         images = [await file.read() for file in files]
         service = ImageService(adapter)
-        return await service.process_images(user_id, images)
+        return await service.process_images(user_id, images, timestamp=timestamp)
     except Exception as e:
         raise HTTPException(
             status_code=500, detail=f"Failed to process images: {str(e)}"

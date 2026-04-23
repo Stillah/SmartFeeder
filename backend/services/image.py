@@ -15,6 +15,7 @@ class ImageService:
         self,
         user_id: UUID,
         image_batch: list[bytes],
+        timestamp: datetime.datetime | None = None,
     ) -> tuple[UUID, list[UUID]]:
         """Get pet_id of the pet in the images and the list of image_id's"""
         image_ids, embeddings = [], []
@@ -34,9 +35,13 @@ class ImageService:
                 labels[label] += 1
 
             most_common_label = labels.most_common(1)[0][0]
-            for embedding in embeddings:
+            for embedding, img_bytes in zip(embeddings, image_batch, strict=True):
                 image_id = await self.adapter.insert(
-                    embedding=embedding, pet_id=most_common_label, user_id=user_id
+                    embedding=embedding,
+                    pet_id=most_common_label,
+                    user_id=user_id,
+                    image_bytes=img_bytes,
+                    timestamp=timestamp,
                 )
                 image_ids.append(image_id)
 
