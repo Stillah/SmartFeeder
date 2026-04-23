@@ -1,4 +1,5 @@
 import cv2
+import numpy as np
 
 
 class CatDetectionCamera:
@@ -63,6 +64,16 @@ class CatDetectionCamera:
 
         # Display the resulting frame
         cv2.imshow("Cat Face and Smile Detection", self._curr_frame)
+
+    def display_collected_files(self, images: list[bytes]):
+        # display images here
+        for idx, img_bytes in enumerate(images):
+            img_array = cv2.imdecode(
+                np.frombuffer(img_bytes, np.uint8),
+                cv2.IMREAD_COLOR
+            )
+            if img_array is not None:
+                cv2.imshow(f"Image {idx}", img_array)
 
     def check_close_display(self) -> bool:
         """Break the loop when the user presses 'q'."""

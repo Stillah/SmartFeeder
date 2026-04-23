@@ -1,14 +1,16 @@
 import argparse, requests, logging
 from datetime import datetime, timedelta
 from requests.exceptions import HTTPError, RequestException
-from weights import Weights
+from weights import Weights, WeightsMock
 from cat_camera import CatDetectionCamera
+import numpy as np
+import cv2
 
 logger = logging.Logger("Camera")
 url = "http://localhost/internal/logs/"
-FRAMES_IN_CYCLE = 30
-FRAMES_THRESHOLD = 20
-INTERVAL_SEC = 1
+FRAMES_IN_CYCLE = 6
+FRAMES_THRESHOLD = 3
+INTERVAL_MS = 250
 
 
 def send_request(user_id: str, images: list[bytes], food_weight: float) -> None:
@@ -34,7 +36,7 @@ def start_camera(user_id: str, display: bool = False) -> None:
     """Constantly check the camera to detect cat presence and send info about food weight to backend."""
 
     camera = CatDetectionCamera()
-    weights = Weights(port="/dev/ttyUSB0", baudrate=115200, timeout=0.1)
+    weights = WeightsMock(port="/dev/ttyUSB0", baud_rate=115200, timeout=0.1)
 
     last = None
     prev_weight = None
@@ -46,8 +48,13 @@ def start_camera(user_id: str, display: bool = False) -> None:
     images = []
 
     while True:
+        if display and last:
+            camera.display()
+        if last and (datetime.now() - last < timedelta(milliseconds=INTERVAL_MS)):
+            continue
         weight_delta = None
         current_weight = weights.get_weight()
+
         prev_cat_here = cat_is_visible
 
         # Exactly one cat
@@ -61,32 +68,37 @@ def start_camera(user_id: str, display: bool = False) -> None:
                 # Cat finished eating
                 if prev_weight and current_weight and prev_cat_here:
                     weight_delta = current_weight - prev_weight
+                    sz = len(images)
+                    images = [images[0], images[sz//2], images[-1]]
+                    # Send API request
                     send_request(
                         user_id=user_id, images=images, food_weight=weight_delta
                     )
+                    # Display images sent to the API
+                    camera.display_collected_files(images)
                     images = []
+                    
                 if current_weight:
                     prev_weight = current_weight
+            cnt_cats = 0
+    
+        frame_number += 1
+        frame_number %= FRAMES_IN_CYCLE + 1
 
-        # save image to send to the API
-        if cat_is_visible and (
-            not last or datetime.now() - last > timedelta(seconds=INTERVAL_SEC)
-        ):
+        if cat_is_visible:
             success, img = camera.get_image()
             if not success:
                 logger.warning("Failed to encode image")
                 raise RuntimeError("Failed to encode image")
 
             images.append(img)
-            last = datetime.now()
 
-        if frame_number == FRAMES_IN_CYCLE:
-            cnt_cats = 0
-        if display:
-            camera.display()
+        last = datetime.now()
+        # time.sleep(1)
+
+        
         if camera.check_close_display():
             break
-        frame_number %= FRAMES_IN_CYCLE + 1
 
     camera.stop()
 

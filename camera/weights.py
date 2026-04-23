@@ -1,27 +1,63 @@
-import struct
-from serial import Serial
+import serial
+import numpy as np
+
+class WeightsMock:
+    START_BYTE = 0x80
+    END_BYTE = 0x81
+    SCALE_MULT = 1000.0
+
+    def __init__(self, port: str, baud_rate: int, timeout: float = 0.1):
+        pass
+
+    def get_weight(self) -> float | None:
+        return np.random.uniform(0.0, 10.0)
 
 
 class Weights:
+    START_BYTE = 0x80
+    END_BYTE = 0x81
+    SCALE_MULT = 1000.0
 
-    def __init__(
-        self, port: str, baudrate: int, timeout: float = 0.1, bytes_in_data: int = 4
-    ):
-        return
-        self.ser = Serial(port=port, baudrate=baudrate, timeout=timeout)
-        self.BYTES_IN_DATA = bytes_in_data
+    def __init__(self, port: str, baud_rate: int, timeout: float = 0.1):
+        self.ser = serial.Serial(port, baud_rate,timeout=timeout)
+
+    def _read_packet(self):
+        b = self.ser.read(1)
+
+        if not b:
+            return None
+
+        if b[0] == self.START_BYTE:
+            data = self.ser.read(7)
+
+            if len(data) != 7:
+                return
+
+            if data[6] != self.END_BYTE:
+                return
+
+            return data[:6]
+
+    def _decode_int42(self, data_bytes: bytes) -> int:
+
+        value = 0
+
+        for b in data_bytes:
+            value = (value << 7) | (b & 0x7F)
+
+        
+        if value & (1 << 41):
+            value -= (1 << 42)
+
+        return value
 
     def get_weight(self) -> float | None:
-        return 1.0
-        if self.ser.in_waiting > self.BYTES_IN_DATA:
-            ready_to_get = self.ser.read(1)
+        packet = self._read_packet()
 
-            if (
-                ready_to_get == b"\xaa"
-            ):  # Byte that detemines that next 4 bytes are weight value
-                raw_data = self.ser.read(self.BYTES_IN_DATA)
+        if packet is None:
+            return None
 
-                if len(raw_data) == self.BYTES_IN_DATA:
-                    weight = struct.unpack(">f", raw_data)[0]
-                    return weight
-        return None
+        raw = self._decode_int42(packet)
+        weight = raw / self.SCALE_MULT
+
+        return weight
