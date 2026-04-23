@@ -17,8 +17,14 @@ class PetModel(Base):
 
     owner: Mapped["UserModel"] = relationship("UserModel", back_populates="pets")
     images: Mapped[list["ImageModel"]] = relationship(
-        "ImageModel", back_populates="pet", cascade="all, delete-orphan"
+        "ImageModel",
+        back_populates="pet",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
     )
     feeding_logs: Mapped[list["LogsModel"]] = relationship(
-        "LogsModel", back_populates="pet", cascade="all, delete-orphan"
+        "LogsModel",
+        back_populates="pet",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
     )

@@ -12,7 +12,9 @@ class ImageModel(Base):
     __tablename__ = "images"
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
-    pet_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("pets.id"), index=True)
+    pet_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("pets.id", ondelete="CASCADE"), index=True
+    )
     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"), index=True)
     embedding: Mapped[list[float]] = mapped_column(Vector(EMBEDDING_DIM))
     image_path: Mapped[str] = mapped_column(String(255), nullable=True)
