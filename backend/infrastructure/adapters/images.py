@@ -79,8 +79,10 @@ class ImageAdapter(ImageInterface):
         image = ImageModel(
             pet_id=pet_id, user_id=user_id, embedding=embedding, image_path=image_path
         )
-        if timestamp is not None:
-            image.timestamp = timestamp
+        if timestamp is None:
+            timestamp = datetime.datetime.now()
+        image.timestamp = timestamp
+        
         self.session.add(image)
         await self.session.commit()
         await self.session.refresh(image)

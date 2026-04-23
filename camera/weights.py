@@ -17,7 +17,7 @@ class WeightsMock:
 class Weights:
     START_BYTE = 0x80
     END_BYTE = 0x81
-    SCALE_MULT = 1000.0
+    SCALE_MULT = 2e6
 
     def __init__(self, port: str, baud_rate: int, timeout: float = 0.1):
         self.ser = serial.Serial(port, baud_rate, timeout=timeout)

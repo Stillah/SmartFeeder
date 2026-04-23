@@ -3,11 +3,9 @@ from datetime import datetime, timedelta
 from requests.exceptions import HTTPError, RequestException
 from weights import Weights, WeightsMock
 from cat_camera import CatDetectionCamera
-import numpy as np
-import cv2
 
 logger = logging.Logger("Camera")
-url = "http://localhost/internal/logs/"
+url = "http://localhost/logs/"
 FRAMES_IN_CYCLE = 6
 FRAMES_THRESHOLD = 3
 INTERVAL_MS = 250
@@ -36,7 +34,7 @@ def start_camera(user_id: str, display: bool = False) -> None:
     """Constantly check the camera to detect cat presence and send info about food weight to backend."""
 
     camera = CatDetectionCamera()
-    weights = WeightsMock(port="/dev/ttyUSB0", baud_rate=115200, timeout=0.1)
+    weights = Weights(port="/dev/ttyUSB0", baud_rate=115200, timeout=0.1)
 
     last = None
     prev_weight = None

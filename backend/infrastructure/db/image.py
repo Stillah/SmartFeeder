@@ -6,6 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from pgvector.sqlalchemy import Vector
 from .base import Base
 
+EMBEDDING_DIM = 2560
 
 class ImageModel(Base):
     __tablename__ = "images"
@@ -13,11 +14,8 @@ class ImageModel(Base):
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     pet_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("pets.id"), index=True)
     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"), index=True)
-    embedding: Mapped[list[float]] = mapped_column(Vector(512))
+    embedding: Mapped[list[float]] = mapped_column(Vector(EMBEDDING_DIM))
     image_path: Mapped[str] = mapped_column(String(255), nullable=True)
-    timestamp: Mapped[dt] = mapped_column(
-        DateTime(timezone=True), default=lambda: dt.now(datetime.UTC)
-    )
     timestamp: Mapped[dt] = mapped_column(
         DateTime(timezone=True), default=lambda: dt.now(datetime.UTC)
     )

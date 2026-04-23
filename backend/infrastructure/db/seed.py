@@ -14,6 +14,8 @@ from backend.infrastructure.db.image import ImageModel
 
 logger = logging.getLogger(__name__)
 
+EMBEDDING_DIM = 2560
+
 
 async def seed_db():
     logger.info("Checking if database needs seeding...")
@@ -98,8 +100,8 @@ async def seed_db():
             with open(filepath, "wb") as f:
                 f.write(tiny_gif)
 
-            # Генерируем случайный эмбеддинг (512 размерность)
-            embedding = [random.uniform(-1.0, 1.0) for _ in range(512)]
+            # Генерируем случайный эмбеддинг (2560 размерность)
+            embedding = [random.uniform(-1.0, 1.0) for _ in range(EMBEDDING_DIM)]
 
             img_model = ImageModel(
                 id=img_id,
