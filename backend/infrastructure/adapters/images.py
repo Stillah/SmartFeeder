@@ -1,4 +1,4 @@
-import numpy as np
+import requests
 import os
 import datetime
 from dataclasses import dataclass
@@ -12,14 +12,19 @@ from backend.infrastructure.db.image import ImageModel
 # SPECIFY !!!
 THRESHOLD = 1.0
 STORAGE_DIR = "storage/images"
+EMBEDDINGS_URL = os.getenv("EMBEDDINGS_URL")
 
 
 @dataclass
 class ImageAdapter(ImageInterface):
     session: AsyncSession
 
-    async def make_embedding(self, img: bytes) -> list[float]:
-        pass
+    async def make_embedding(self, img: bytes) -> list[float] | None:
+        if EMBEDDINGS_URL:
+            files = {"files": img}
+            return await requests.post(EMBEDDINGS_URL, files=files).json()["embedding"]
+
+        raise Exception("Please specify EMBEDDINGS_URL in .env!")
 
     async def classify(
         self, embedding: list[float], user_id: UUID, k: int = 7
@@ -65,6 +70,7 @@ class ImageAdapter(ImageInterface):
         if image_bytes:
             os.makedirs(STORAGE_DIR, exist_ok=True)
             import uuid
+
 
             filename = f"{uuid.uuid4()}.jpg"
             image_path = os.path.join(STORAGE_DIR, filename)

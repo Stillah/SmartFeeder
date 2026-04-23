@@ -10,6 +10,7 @@ class PetCreate(BaseModel):
     breed: str | None = None
     target_portion: float | None = None
 
+
 class PetUpdate(BaseModel):
     name: str | None = None
     weight: float | None = None

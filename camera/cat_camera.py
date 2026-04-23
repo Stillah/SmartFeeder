@@ -69,8 +69,7 @@ class CatDetectionCamera:
         # display images here
         for idx, img_bytes in enumerate(images):
             img_array = cv2.imdecode(
-                np.frombuffer(img_bytes, np.uint8),
-                cv2.IMREAD_COLOR
+                np.frombuffer(img_bytes, np.uint8), cv2.IMREAD_COLOR
             )
             if img_array is not None:
                 cv2.imshow(f"Image {idx}", img_array)

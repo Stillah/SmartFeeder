@@ -69,7 +69,7 @@ def start_camera(user_id: str, display: bool = False) -> None:
                 if prev_weight and current_weight and prev_cat_here:
                     weight_delta = current_weight - prev_weight
                     sz = len(images)
-                    images = [images[0], images[sz//2], images[-1]]
+                    images = [images[0], images[sz // 2], images[-1]]
                     # Send API request
                     send_request(
                         user_id=user_id, images=images, food_weight=weight_delta
@@ -77,11 +77,11 @@ def start_camera(user_id: str, display: bool = False) -> None:
                     # Display images sent to the API
                     camera.display_collected_files(images)
                     images = []
-                    
+
                 if current_weight:
                     prev_weight = current_weight
             cnt_cats = 0
-    
+
         frame_number += 1
         frame_number %= FRAMES_IN_CYCLE + 1
 
@@ -96,7 +96,6 @@ def start_camera(user_id: str, display: bool = False) -> None:
         last = datetime.now()
         # time.sleep(1)
 
-        
         if camera.check_close_display():
             break
 

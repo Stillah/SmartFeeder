@@ -9,7 +9,7 @@ class ImageInterface(Protocol):
     """Interface for working with camera images."""
 
     @abstractmethod
-    async def make_embedding(self, img: bytes) -> list[float]:
+    async def make_embedding(self, img: bytes) -> list[float] | None:
         """Make an embedding from an image."""
 
     @abstractmethod

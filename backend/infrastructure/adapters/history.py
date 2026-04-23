@@ -51,6 +51,15 @@ class HistoryAdapter(HistoryInterface):
             .order_by(LogsModel.timestamp.desc())
             .limit(limit)
         )
+    async def get_recent_feedings(
+        self, pet_id: UUID, limit: int = 10
+    ) -> List[FeedingLogResponse]:
+        stmt = (
+            select(LogsModel)
+            .where(LogsModel.pet_id == pet_id)
+            .order_by(LogsModel.timestamp.desc())
+            .limit(limit)
+        )
         result = await self.session.execute(stmt)
         logs = result.scalars().all()
         return [FeedingLogResponse.model_validate(log) for log in logs]

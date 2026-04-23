@@ -34,15 +34,27 @@ async def get_pet(pet_id: UUID, adapter: PetsAdapter = Depends(get_pets_adapter)
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to load pet: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to load pet: {str(e)}",
+        )
+
 
 @router.put("/{pet_id}")
-async def update_pet(pet_id: UUID, pet_update: PetUpdate, adapter: PetsAdapter = Depends(get_pets_adapter)):
+async def update_pet(
+    pet_id: UUID,
+    pet_update: PetUpdate,
+    adapter: PetsAdapter = Depends(get_pets_adapter),
+):
     try:
         await adapter.update(pet_id, **pet_update.model_dump(exclude_unset=True))
         return {"status": "success"}
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to update pet: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to update pet: {str(e)}",
+        )
+
 
 @router.delete("/{pet_id}")
 async def delete_pet(pet_id: UUID, adapter: PetsAdapter = Depends(get_pets_adapter)):

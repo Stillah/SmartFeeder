@@ -11,5 +11,9 @@ class UserModel(Base):
     email: Mapped[str] = mapped_column(default="default@example.com")
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
-    pets: Mapped[list["PetModel"]] = relationship("PetModel", back_populates="owner", cascade="all, delete-orphan")
-    schedules: Mapped[list["ScheduleModel"]] = relationship("ScheduleModel", back_populates="user", cascade="all, delete-orphan")
+    pets: Mapped[list["PetModel"]] = relationship(
+        "PetModel", back_populates="owner", cascade="all, delete-orphan"
+    )
+    schedules: Mapped[list["ScheduleModel"]] = relationship(
+        "ScheduleModel", back_populates="user", cascade="all, delete-orphan"
+    )

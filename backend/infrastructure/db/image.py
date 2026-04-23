@@ -18,6 +18,9 @@ class ImageModel(Base):
     timestamp: Mapped[dt] = mapped_column(
         DateTime(timezone=True), default=lambda: dt.now(datetime.UTC)
     )
+    timestamp: Mapped[dt] = mapped_column(
+        DateTime(timezone=True), default=lambda: dt.now(datetime.UTC)
+    )
 
     pet: Mapped["PetModel"] = relationship("PetModel", back_populates="images")
     user: Mapped["UserModel"] = relationship("UserModel")
