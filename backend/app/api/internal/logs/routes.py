@@ -11,11 +11,11 @@ router = APIRouter(prefix="/logs", tags=["Internal Images"])
 @router.post("/")
 async def create_log(
     user_id: UUID,
-    files_batch: list[UploadFile],
     food_weight: float,
+    files_batch: list[UploadFile],
     image_adapter: ImageAdapter = Depends(get_image_adapter),
     history_adapter: HistoryAdapter = Depends(get_history_adapter),
-) -> None:
+) -> list[UUID]:
     try:
         images = [await file.read() for file in files_batch]
         service = ImageService(image_adapter)
@@ -23,6 +23,7 @@ async def create_log(
 
         # Add your extra functionality here
         await history_adapter.add_feeding_log(pet_id=pet_id, amount_eaten=food_weight)
+        return image_ids
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to create log: {str(e)}")

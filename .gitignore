@@ -65,4 +65,4 @@ venv
 .env
 
 cat_net_api/model/best_ppgnnet_cat.pth
-
+*cache
