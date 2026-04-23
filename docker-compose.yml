@@ -30,6 +30,7 @@ services:
       POSTGRES_HOST: db
       # внутри сети compose слушает Postgres на 5432 (не порт публикации на хосте)
       POSTGRES_PORT: "5432"
+      EMBEDDINGS_URL: ${EMBEDDINGS_URL}
     depends_on:
       db:
         condition: service_healthy

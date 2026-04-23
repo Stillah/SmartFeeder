@@ -1,7 +1,9 @@
-import requests
+import logging
 import os
 import datetime
 from dataclasses import dataclass
+
+import requests
 from uuid import UUID
 from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -14,6 +16,8 @@ THRESHOLD = 1.0
 STORAGE_DIR = "storage/images"
 EMBEDDINGS_URL = os.getenv("EMBEDDINGS_URL")
 
+logger = logging.getLogger(__name__)
+
 
 @dataclass
 class ImageAdapter(ImageInterface):
@@ -21,8 +25,47 @@ class ImageAdapter(ImageInterface):
 
     async def make_embedding(self, img: bytes) -> list[float] | None:
         if EMBEDDINGS_URL:
-            files = {"files": img}
-            return await requests.post(EMBEDDINGS_URL, files=files).json()["embedding"]
+            files = {"file": ("image.jpg", img, "image/jpeg")}
+            logger.info(
+                "make_embedding: POST %s, image_bytes=%d",
+                EMBEDDINGS_URL,
+                len(img),
+            )
+            resp = requests.post(EMBEDDINGS_URL, files=files, timeout=120)
+            logger.info(
+                "make_embedding: response status=%s content_type=%s",
+                resp.status_code,
+                resp.headers.get("content-type"),
+            )
+            if not resp.ok:
+                logger.error(
+                    "make_embedding: non-OK response body (first 2k): %s",
+                    resp.text[:2000],
+                )
+            try:
+                data = resp.json()
+            except ValueError:
+                logger.error(
+                    "make_embedding: response is not JSON, text (first 2k): %s",
+                    resp.text[:2000],
+                )
+                raise
+            if not isinstance(data, dict):
+                logger.error(
+                    "make_embedding: expected JSON object, got %s preview=%s",
+                    type(data).__name__,
+                    str(data)[:500],
+                )
+                raise ValueError(
+                    f"Embeddings API returned {type(data).__name__}, expected object with 'embedding'"
+                )
+            if "embedding" not in data:
+                logger.error(
+                    "make_embedding: JSON has no 'embedding' key; keys=%s preview=%s",
+                    list(data.keys()),
+                    str(data)[:500],
+                )
+            return data["embedding"]
 
         raise Exception("Please specify EMBEDDINGS_URL in .env!")
 
