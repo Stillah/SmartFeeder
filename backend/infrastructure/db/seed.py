@@ -92,7 +92,7 @@ async def seed_db():
         images = []
         for i in range(3):
             img_id = uuid.uuid4()
-            filename = f"{img_id}.gif"
+            filename = f"{img_id}.jpg"
             filepath = os.path.join(storage_dir, filename)
 
             with open(filepath, "wb") as f:
