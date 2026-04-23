@@ -28,14 +28,26 @@ async def test_send_image(async_client, mock_image_adapter):
 
     response = await async_client.post(f"/image/?user_id={user_id}", files=files)
 
-    assert response.status_code == 200
+    assert response.status_code == 200, response.json()
     result = response.json()
     assert isinstance(result, list)
     assert result[1][0] == str(image_id)
 
     mock_image_adapter.make_embedding.assert_called_once_with(b"fake_image_data")
-    mock_image_adapter.classify.assert_called_once_with(embedding=[0.1, 0.2, 0.3], user_id=user_id)
-    mock_image_adapter.insert.assert_called_once_with(embedding=[0.1, 0.2, 0.3], pet_id=pet_id, user_id=user_id, image_bytes=b"fake_image_data")
+    mock_image_adapter.classify.assert_called_once_with(
+        embedding=[0.1, 0.2, 0.3], user_id=user_id
+    )
+
+    # We check that insert was called with timestamp=None or an instance of datetime,
+    # since process_images might pass a default timestamp if None is provided in the route.
+    assert mock_image_adapter.insert.call_count == 1
+    call_kwargs = mock_image_adapter.insert.call_args.kwargs
+    assert call_kwargs["embedding"] == [0.1, 0.2, 0.3]
+    assert call_kwargs["pet_id"] == pet_id
+    assert call_kwargs["user_id"] == user_id
+    assert call_kwargs["image_bytes"] == b"fake_image_data"
+    assert "timestamp" in call_kwargs
+
 
 @pytest.mark.asyncio
 async def test_send_image_classification_error(async_client, mock_image_adapter):

@@ -15,8 +15,9 @@ class ImageModel(Base):
     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"), index=True)
     embedding: Mapped[list[float]] = mapped_column(Vector(512))
     image_path: Mapped[str] = mapped_column(String(255), nullable=True)
-    timestamp: Mapped[dt] = mapped_column(DateTime(timezone=True), default=lambda: dt.now(datetime.UTC))
+    timestamp: Mapped[dt] = mapped_column(
+        DateTime(timezone=True), default=lambda: dt.now(datetime.UTC)
+    )
 
     pet: Mapped["PetModel"] = relationship("PetModel", back_populates="images")
     user: Mapped["UserModel"] = relationship("UserModel")
-

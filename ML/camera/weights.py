@@ -7,10 +7,10 @@ class Weights:
     SCALE_MULT = 1000.0
 
     def __init__(self, port: str, baud_rate: int, timeout: float = 0.1):
-        self.ser = serial.Serial(port, baud_rate,timeout=timeout)
+        self.ser = serial.Serial(port, baud_rate, timeout=timeout)
 
     def _read_packet(self):
-        
+
         while True:
             b = self.ser.read(1)
 
@@ -35,9 +35,8 @@ class Weights:
         for b in data_bytes:
             value = (value << 7) | (b & 0x7F)
 
-        
         if value & (1 << 41):
-            value -= (1 << 42)
+            value -= 1 << 42
 
         return value
 
